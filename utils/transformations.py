@@ -1,5 +1,4 @@
 import torch
-from sklearn.decomposition import PCA
 
 
 def transform_tensor(tensor):
