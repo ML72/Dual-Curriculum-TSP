@@ -231,3 +231,21 @@ def search_2opt(positions, tours):
     M, N = tours.shape
     for i in range(N-2):
         _2opt_search_batch(positions, tours, i)
+
+def combined_local_search(positions, tour, iters=10, alpha=0.5, beta=1.5):
+    """
+    Conducts a combined local search on a batch of tours.
+
+    Args:
+    - positions (torch.Tensor): A 3D tensor of shape (M, N, 2) where M is the number of tours
+        in the batch and N is the number of points in each tour.
+    - tours (torch.Tensor): A 2D tensor of shape (M, N) where M is the number of tours and N
+        is the number of points in each tour.
+    - iters (Integer): Number of total iterations to conduct search
+    - alpha (Float): Hyperparameter controlling strength for random 2-opt
+    - beta (Float): Hyperparameter controlling strength for random 2-opt
+    """
+    for i in range(iters):
+        local_insertion(positions, tour)
+        random_2opt(positions, tour, alpha=alpha, beta=beta)
+        search_2opt(positions, tour)
