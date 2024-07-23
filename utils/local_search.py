@@ -217,8 +217,8 @@ def random_2opt(positions, tours, alpha=0.5, beta=1.5):
     """
     M, N = tours.shape
     for i in range(int(alpha * (N ** beta))):
-        e1 = torch.randint(0, N, (M,))
-        e2 = torch.randint(0, N, (M,))
+        e1 = torch.randint(0, N, (M,), device=positions.device)
+        e2 = torch.randint(0, N, (M,), device=positions.device)
         _2opt_choice_batch(positions, tours, e1, e2)
 
 def search_2opt(positions, tours):
