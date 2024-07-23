@@ -15,6 +15,7 @@ from reinforce_baselines import NoBaseline, ExponentialBaseline, CriticBaseline,
 from nets.attention_model import AttentionModel
 from nets.pointer_network import PointerNetwork, CriticNetworkLSTM
 from utils import torch_load_cpu, load_problem
+from utils.transformations import transform_tensor_batch
 
 
 def run(opts):
@@ -156,6 +157,8 @@ def run(opts):
     else:
         training_dataset = None
         for epoch in range(opts.epoch_start, opts.epoch_start + opts.n_epochs):
+            if training_dataset != None and opts.data_equivariance:
+                training_dataset = transform_tensor_batch(training_dataset)
             training_dataset = train_epoch(
                 model,
                 optimizer,
