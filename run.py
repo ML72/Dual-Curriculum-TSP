@@ -157,8 +157,6 @@ def run(opts):
     else:
         training_dataset = None
         for epoch in range(opts.epoch_start, opts.epoch_start + opts.n_epochs):
-            if training_dataset != None and opts.data_equivariance:
-                training_dataset = transform_tensor_batch(training_dataset)
             training_dataset = train_epoch(
                 model,
                 optimizer,

@@ -9,6 +9,7 @@ from torch.nn import DataParallel
 
 from nets.attention_model import set_decode_type
 from utils.level_edit import global_perturb_tensor, local_perturb_tensor, random_edit_tensor
+from utils.transformations import transform_tensor_batch
 from utils.log_utils import log_values
 from utils import move_to
 
@@ -98,6 +99,9 @@ def train_epoch(
 
     for batch_id, batch in enumerate(tqdm(training_dataloader, disable=opts.no_progress_bar)):
 
+        if opts.data_equivariance:
+            batch = transform_tensor_batch(batch)
+        
         train_batch(
             model,
             optimizer,
