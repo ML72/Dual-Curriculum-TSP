@@ -99,11 +99,6 @@ def train_epoch(
 
     for batch_id, batch in enumerate(tqdm(training_dataloader, disable=opts.no_progress_bar)):
 
-        print("Batch is:")
-        print(batch)
-        if opts.data_equivariance:
-            batch = transform_tensor_batch(batch)
-        
         train_batch(
             model,
             optimizer,
@@ -187,6 +182,12 @@ def train_batch(
         opts
 ):
     x, bl_val = baseline.unwrap_batch(batch)
+
+    # Apply data transformations if specified
+    if opts.data_equivariance:
+        x = transform_tensor_batch(x)
+
+    # Move to GPU if available
     x = move_to(x, opts.device)
     bl_val = move_to(bl_val, opts.device) if bl_val is not None else None
 
