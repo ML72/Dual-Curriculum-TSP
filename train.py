@@ -99,6 +99,8 @@ def train_epoch(
 
     for batch_id, batch in enumerate(tqdm(training_dataloader, disable=opts.no_progress_bar)):
 
+        print("Batch is:")
+        print(batch)
         if opts.data_equivariance:
             batch = transform_tensor_batch(batch)
         
