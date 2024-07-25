@@ -1,0 +1,29 @@
+#!/bin/bash
+
+#SBATCH --job-name=model-training
+#SBATCH --mail-user=ml10872@uw.edu
+
+#SBATCH --account=socialrl
+#SBATCH --partition=gpu-l40s
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40
+#SBATCH --mem=100GB
+#SBATCH --gpus=1
+#SBATCH --time=02-00:00:00
+
+#SBATCH --export=all
+#SBATCH --output=out.txt
+#SBATCH --error=err.txt
+
+
+
+# Setup commands
+. ~/.bashrc
+cd /gscratch/socialrl/ml10872/tsp/Dual-Curriculum-TSP/
+conda activate dcd_tsp
+
+# Training commands
+python run.py --problem tsp --graph_size 20 --baseline rollout --edit_fn local_perturb --epoch_size 16384 --batch_size 2048 --n_epochs 2500 --checkpoint_epochs 100 --run_name dcd_local --data_equivariance
+python run.py --problem tsp --graph_size 50 --baseline rollout --edit_fn local_perturb --epoch_size 16384 --batch_size 2048 --n_epochs 2500 --checkpoint_epochs 100 --run_name dcd_local --data_equivariance
+python run.py --problem tsp --graph_size 20 --baseline rollout --epoch_size 16384 --batch_size 2048 --n_epochs 2500 --checkpoint_epochs 100 --run_name baseline --data_equivariance
+python run.py --problem tsp --graph_size 50 --baseline rollout --epoch_size 16384 --batch_size 2048 --n_epochs 2500 --checkpoint_epochs 100 --run_name baseline --data_equivariance
