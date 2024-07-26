@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=model-training
+#SBATCH --job-name=training
 #SBATCH --mail-user=ml10872@uw.edu
 
 #SBATCH --account=socialrl
