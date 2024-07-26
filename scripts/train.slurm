@@ -4,14 +4,12 @@
 #SBATCH --mail-user=ml10872@uw.edu
 
 #SBATCH --account=socialrl
-#SBATCH --partition=gpu-l40s
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=40
-#SBATCH --mem=100GB
+#SBATCH --partition=gpu-l40
+#SBATCH --cpus-per-task=2
+#SBATCH --mem=40GB
 #SBATCH --gpus=1
 #SBATCH --time=02-00:00:00
 
-#SBATCH --export=all
 #SBATCH --output=out.txt
 #SBATCH --error=err.txt
 
