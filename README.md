@@ -33,6 +33,11 @@ Alternatively, dependencies can be installed manually:
 * [tensorboard_logger](https://github.com/TeamHG-Memex/tensorboard_logger)
 * [Matplotlib](https://matplotlib.org/)
 
+To work with the Concorde solver, which we treat as an oracle, run the following command. Note that only `concorde_baseline.py` uses Concorde; the rest of the code still runs smoothly even if Concorde is not installed. We've found success installing Concorde on Linux but not Windows.
+
+```
+pip install "pyconcorde @ git+https://github.com/jvkersch/pyconcorde"
+```
 
 ## Usage
 
