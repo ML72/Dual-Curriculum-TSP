@@ -1,10 +1,8 @@
 #!/bin/bash
 
-#SBATCH --job-name=training
-#SBATCH --mail-user=ml10872@uw.edu
-
-#SBATCH --account=socialrl
-#SBATCH --partition=gpu-l40
+#SBATCH --job-name=train
+#SBATCH --account=cse
+#SBATCH --partition=ckpt
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=40GB
 #SBATCH --gpus=1
