@@ -92,15 +92,17 @@ def train_epoch(
         training_dataset = problem.make_dataset(
             size=opts.graph_size, num_samples=opts.epoch_size, distribution=opts.data_distribution
         )
-    training_dataset_wrapped = baseline.wrap_dataset(training_dataset)
-    training_dataloader = DataLoader(training_dataset_wrapped, batch_size=opts.batch_size, num_workers=1)
-
-    # Randomly make half harder if hardness adaptive curriculum is used
+    
+    # Randomly make half the data harder if hardness adaptive curriculum is used
     if opts.hardness_adaptive:
         random.shuffle(training_dataset.data)
         mid = training_dataset.size // 2
         hard_data = get_hard_samples(model, training_dataset.data[mid:], eps=5, device=opts.device, baseline=baseline)
         training_dataset.data[mid:] = hard_data
+    
+    # Wrap dataset in DataLoader
+    training_dataset_wrapped = baseline.wrap_dataset(training_dataset)
+    training_dataloader = DataLoader(training_dataset_wrapped, batch_size=opts.batch_size, num_workers=1)
 
     # Put model in train mode!
     model.train()
