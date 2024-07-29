@@ -45,7 +45,7 @@ pip install "pyconcorde @ git+https://github.com/jvkersch/pyconcorde"
 
 Training data is generated on the fly. To generate validation and test data (same as used in the paper) for the TSP:
 ```
-python generate_data.py --problem tsp --name validation --seed 4321
+python generate_data.py --problem tsp --name validation --seed 1234
 python generate_data.py --problem tsp --name test --seed 1234
 ```
 
@@ -99,6 +99,18 @@ python eval.py data/tsp/tsp100_test_seed1234.pkl --model outputs/tsp_100/tsp100_
 Example using a specific epoch and saving to a specific result name (note that setting `--width 0` is necessary for using `-o`):
 ```
 python eval.py data/tsp/tsp100_test_seed1234.pkl --model outputs/tsp_100/tsp100_default/epoch-50.pt -o results/tsp/tsp20_test_seed1234_epochs/tsp100_default_epoch-50.pkl --width 0 --decode_strategy greedy --eval_batch_size 128
+```
+
+To use a "oracle baseline" for computing gap, add the following flag:
+
+```
+--oracle_baseline <BASELINE-FILE>
+```
+
+Running `concorde_baseline.py` can create such a baseline file; note that `pyconcorde` needs to have been correctly installed to run without error:
+
+```
+python concorde_baseline.py --data_path <DATA-FILE>
 ```
 
 #### Sampling
