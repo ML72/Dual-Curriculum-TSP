@@ -24,7 +24,7 @@ def get_hard_samples(model, data, eps=5, batch_size=1024, device='cpu', baseline
         cost, ll, pi = model(data, return_pi=True)
         if baseline is not None:
             with torch.no_grad():
-                cost_b, _ = baseline.model(data)
+                cost_b, _ = baseline.eval(data)
             cost, ll = model(data)
             delta = torch.autograd.grad(eps * ((cost/cost_b) * ll).mean(), data)[0]
         else:
