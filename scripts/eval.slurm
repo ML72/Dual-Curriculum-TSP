@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #SBATCH --job-name=eval
-#SBATCH --account=socialrl
-#SBATCH --partition=gpu-l40
+#SBATCH --account=cse
+#SBATCH --partition=ckpt
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=40GB
 #SBATCH --gpus=1
