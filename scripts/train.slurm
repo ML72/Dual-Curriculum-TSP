@@ -19,7 +19,8 @@ cd /gscratch/socialrl/ml10872/tsp/Dual-Curriculum-TSP/
 conda activate dcd_tsp
 
 # Training commands
-python run.py --problem tsp --graph_size 50 --baseline rollout --epoch_size 16384 --batch_size 1024 --n_epochs 400 --checkpoint_epochs 50 --run_name test_vanilla
-python run.py --problem tsp --graph_size 50 --baseline rollout --edit_fn local_perturb --epoch_size 16384 --batch_size 1024 --n_epochs 400 --checkpoint_epochs 50 --run_name test_dcd
-python run.py --problem tsp --graph_size 50 --baseline rollout --hardness_adaptive --epoch_size 16384 --batch_size 1024 --n_epochs 400 --checkpoint_epochs 50 --run_name test_hac
-python run.py --problem tsp --graph_size 50 --baseline rollout --edit_fn local_perturb --hardness_adaptive --epoch_size 16384 --batch_size 1024 --n_epochs 400 --checkpoint_epochs 50 --run_name test_dcd_hac
+echo "TRAINING TSP50"
+python run.py --problem tsp --graph_size 50 --baseline rollout --epoch_size 65536 --batch_size 1024 --n_epochs 100 --checkpoint_epochs 10 --run_name test_vanilla
+python run.py --problem tsp --graph_size 50 --baseline rollout --edit_fn local_perturb --epoch_size 65536 --batch_size 1024 --n_epochs 100 --checkpoint_epochs 10 --run_name test_dcd
+python run.py --problem tsp --graph_size 50 --baseline rollout --hardness_adaptive --epoch_size 65536 --batch_size 1024 --n_epochs 100 --checkpoint_epochs 10 --run_name test_hac
+python run.py --problem tsp --graph_size 50 --baseline rollout --edit_fn local_perturb --hardness_adaptive --epoch_size 65536 --batch_size 1024 --n_epochs 100 --checkpoint_epochs 10 --run_name test_dcd_hac
