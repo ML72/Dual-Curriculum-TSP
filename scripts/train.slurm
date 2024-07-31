@@ -20,9 +20,9 @@ conda activate dcd_tsp
 
 # Training commands
 echo "TRAINING TSP50"
-python run.py --problem tsp --graph_size 50 --baseline rollout --epoch_size 65536 --batch_size 1024 --n_epochs 100 --checkpoint_epochs 10 --lr_decay 0.98 --pretrain_path pretrained/tsp_50 --run_name test_vanilla_decay
-python run.py --problem tsp --graph_size 50 --baseline rollout --edit_fn local_perturb --epoch_size 65536 --batch_size 1024 --n_epochs 100 --checkpoint_epochs 10 --lr_decay 0.98 --pretrain_path pretrained/tsp_50 --run_name test_dcd_decay
-python run.py --problem tsp --graph_size 50 --baseline rollout --hardness_adaptive --epoch_size 65536 --batch_size 1024 --n_epochs 100 --checkpoint_epochs 10 --lr_decay 0.98 --pretrain_path pretrained/tsp_50 --run_name test_hac_decay
+python run.py --problem tsp --graph_size 50 --baseline rollout --epoch_size 65536 --batch_size 1024 --n_epochs 100 --checkpoint_epochs 10 --lr_decay 0.98 --pretrain_path pretrained/tsp_50 --run_name test_vanilla
+python run.py --problem tsp --graph_size 50 --baseline rollout --edit_fn local_perturb --epoch_size 65536 --batch_size 1024 --n_epochs 100 --checkpoint_epochs 10 --lr_decay 0.98 --pretrain_path pretrained/tsp_50 --run_name test_dcd
+python run.py --problem tsp --graph_size 50 --baseline rollout --hardness_adaptive --epoch_size 65536 --batch_size 1024 --n_epochs 100 --checkpoint_epochs 10 --lr_decay 0.98 --pretrain_path pretrained/tsp_50 --run_name test_hac
 python run.py --problem tsp --graph_size 50 --baseline rollout --edit_fn local_perturb --hardness_adaptive --epoch_size 65536 --batch_size 1024 --n_epochs 100 --checkpoint_epochs 10 --lr_decay 0.98 --pretrain_path pretrained/tsp_50 --run_name test_dcd_hac
 
 # Evaluation commands
