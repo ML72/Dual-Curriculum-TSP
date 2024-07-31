@@ -52,7 +52,7 @@ def run(opts):
     # Initialize model
     if opts.pretrain_path is not None:
         print('  [*] Loading pretrained model from {}'.format(opts.pretrain_path))
-        model = load_model(opts.pretrain_path)
+        model, _ = load_model(opts.pretrain_path)
     else:
         model_class = {
             'attention': AttentionModel,
