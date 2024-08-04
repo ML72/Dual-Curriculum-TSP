@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Generate Data
-python generate_data.py --problem tsp --name validation --seed 1234 -f
 python generate_data.py --problem tsp --name test --seed 1234 -f
 
 # Eval commands
@@ -17,3 +16,6 @@ rm *.res
 echo "STARTING DIAG EVAL"
 python concorde_baseline.py --data_path data/tsp/tsp_diag50_test_seed1234.pkl
 rm *.res
+
+rm *.pul
+rm *.sav
