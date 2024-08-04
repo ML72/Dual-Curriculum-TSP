@@ -49,9 +49,15 @@ if __name__ == "__main__":
     )
 
     # Write to output
-    costs = costs.numpy().tolist()
     result_dir = f"results/tsp/{name}"
     os.makedirs(result_dir, exist_ok=True)
+
+    costs = costs.numpy().tolist()
     with open(f"{result_dir}/concorde_costs.pkl", "wb") as f:
         pickle.dump(costs, f, pickle.HIGHEST_PROTOCOL)
-    print(f"Saved concorde results to {result_dir}/concorde_costs.pkl")
+    print(f"Saved concorde costs to {result_dir}/concorde_costs.pkl")
+
+    tours = tours.tolist()
+    with open(f"{result_dir}/concorde_tours.pkl", "wb") as f:
+        pickle.dump(tours, f, pickle.HIGHEST_PROTOCOL)
+    print(f"Saved concorde tours to {result_dir}/concorde_tours.pkl")
