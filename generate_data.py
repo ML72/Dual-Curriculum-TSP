@@ -2,7 +2,7 @@ import argparse
 import os
 import numpy as np
 from utils.data_utils import check_extension, save_dataset
-from utils.distributions import gaussian_mixture_batch, poly_batch
+from utils.distributions import gaussian_mixture_batch, poly_batch, diag_batch
 
 
 def generate_tsp_data(dataset_size, tsp_size, distribution='unif'):
@@ -22,6 +22,15 @@ def generate_tsp_data(dataset_size, tsp_size, distribution='unif'):
         res = []
         for n_corners in n_corners_list:
             res.append(poly_batch(split_size, tsp_size, n_corners))
+        return np.concatenate(res, axis=0).tolist()
+    
+    # Diagonal distribution
+    if distribution == 'diag':
+        dist_list = [1, 2, 3, 4, 5]
+        split_size = dataset_size // len(dist_list)
+        res = []
+        for dist in dist_list:
+            res.append(diag_batch(split_size, tsp_size, dist))
         return np.concatenate(res, axis=0).tolist()
     
     # Uniform distribution, default
@@ -136,7 +145,7 @@ if __name__ == "__main__":
         "Can only specify filename when generating a single dataset"
 
     distributions_per_problem = {
-        'tsp': ['unif', 'gmm', 'poly'],
+        'tsp': ['unif', 'gmm', 'poly', 'diag'],
         'vrp': [None],
         'pctsp': [None],
         'op': ['const', 'unif', 'dist']
