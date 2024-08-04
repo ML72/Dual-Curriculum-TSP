@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Generate Data
-python generate_data.py --problem tsp --name validation --seed 1234
-python generate_data.py --problem tsp --name test --seed 1234
+python generate_data.py --problem tsp --name validation --seed 1234 -f
+python generate_data.py --problem tsp --name test --seed 1234 -f
 
 # Eval commands
 echo "STARTING UNIF EVAL"
