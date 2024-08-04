@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Generate Data
+python generate_data.py --problem tsp --name validation --seed 1234
 python generate_data.py --problem tsp --name test --seed 1234
 
 # Eval commands
