@@ -288,6 +288,6 @@ if __name__ == "__main__":
                     }
                     results_prefix = results_prefix[:-len(str(epoch)+'_epoch-')]
                 with open(results_prefix + "-epoch_data.json", 'w') as f:
-                    json.dump(res, f)
+                    json.dump(res, f, indent=2)
             else:
                 eval_dataset(dataset_path, width, opts.softmax_temperature, opts)

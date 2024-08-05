@@ -19,3 +19,4 @@ rm *.res
 
 rm *.pul
 rm *.sav
+rm *.sol

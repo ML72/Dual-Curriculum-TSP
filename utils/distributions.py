@@ -68,13 +68,17 @@ def poly_batch(batch_size, tsp_size, n_corners, noise=0.05):
     return points
 
 def diag_batch(batch_size, tsp_size, dist):
-    # Generate points at random opposing diagonals
+    # Generate points along random diagonal
+    partition_size = tsp_size // dist
     points = np.random.uniform(0, 1, size=(batch_size, tsp_size, 2))
     ones = np.ones(2)
     for i in range(batch_size):
-        n = np.random.randint(tsp_size // 4, tsp_size * 3 // 4)
-        idx = np.random.choice(tsp_size, n, replace=False)
-        points[i, idx] += ones * dist
+        for j in range(1, dist):
+            for k in range(partition_size):
+                idx = j * partition_size + k
+                points[i, idx] += ones * j + np.random.uniform(-0.2, 0.2, size=2)
+
+        # Random diagonal
         if np.random.rand() < 0.5:
             points[i, :, 0] *= -1
     
