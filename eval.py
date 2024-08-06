@@ -72,22 +72,36 @@ def eval_dataset(dataset_path, width, softmax_temp, opts):
 
     else:
         device = torch.device("cuda:0" if use_cuda else "cpu")
-
-        # Load appropriate dataset
-        if not bool(opts.load_TSPDataset):
+            
+        if not opts.load_tsplib:
+            # Case 1: Load dataset from test file
             dataset = model.problem.make_dataset(filename=dataset_path, num_samples=opts.val_size, offset=opts.offset)
+            
+            # Load oracle if necessary
+            if use_oracle:
+                with open(opts.oracle_baseline, 'rb') as f:
+                    oracle_baseline = pkl.load(f)
+                assert len(oracle_baseline) == len(dataset), "Oracle baseline does not have same number of entries as dataset"
+            
+            # Evaluate model on dataset
+            results = _eval_dataset(model, dataset, width, softmax_temp, opts, device)
         else:
-            with open(dataset_path, 'rb') as f:
-                dataset = pkl.load(f)
-        
-        # Load oracle if necessary
-        if use_oracle:
-            with open(opts.oracle_baseline, 'rb') as f:
-                oracle_baseline = pkl.load(f)
-            assert len(oracle_baseline) == len(dataset), "Oracle baseline does not have same number of entries as dataset"
-        
-        # Evaluate model on dataset
-        results = _eval_dataset(model, dataset, width, softmax_temp, opts, device)
+            # Case 2: Load dataset from TSPLib folder
+            names = []
+            for filename in os.listdir(dataset_path):
+                if filename.endswith(".npy"):
+                    if not filename.endswith("sol.npy"):
+                        names.append(filename.split(".")[0])
+            
+            use_oracle = True
+            results = []
+            oracle_baseline = []
+            for name in names:
+                dataset = model.problem.make_dataset(
+                    filename=os.path.join(dataset_path, f"{name}.npy"), num_samples=1, offset=0
+                )
+                oracle_baseline.append(np.load(os.path.join(dataset_path, name + "_sol.npy"))[0][0][0])
+                results.extend(_eval_dataset(model, dataset, width, softmax_temp, opts, device))
 
     # This is parallelism, even if we use multiprocessing (we report as if we did not use multiprocessing, e.g. 1 GPU)
     parallelism = opts.eval_batch_size
@@ -147,20 +161,11 @@ def _eval_dataset(model, dataset, width, softmax_temp, opts, device):
         temp=softmax_temp)
 
 
-    if not bool(opts.load_TSPDataset):
-        dataloader = DataLoader(dataset, batch_size=opts.eval_batch_size)
-    else:
-        dataloader = dataset
-
+    dataloader = DataLoader(dataset, batch_size=opts.eval_batch_size)
     results = []
     for batch in tqdm(dataloader, disable=opts.no_progress_bar):
         
-        if not bool(opts.load_TSPDataset):
-            batch = move_to(batch, device)
-        if bool(opts.load_TSPDataset):
-            print(torch.stack(batch, dim=0)[None, :, :].shape)
-            batch = move_to(torch.stack(batch, dim=0)[None, :, :], device)
-
+        batch = move_to(batch, device)
         start = time.time()
         with torch.no_grad():
             if opts.decode_strategy in ('sample', 'greedy'):
@@ -235,8 +240,7 @@ if __name__ == "__main__":
     parser.add_argument('--eval_batch_size', type=int, default=1024,
                         help="Batch size to use during (baseline) evaluation")
 
-    parser.add_argument('--load_TSPDataset', type=str, choices=["true", "false"],
-                        help="Batch size to use during (baseline) evaluation")
+    parser.add_argument('--load_tsplib', action='store_true', help="Whether to treat the input path as a TSPLib folder")
     parser.add_argument('--width', type=int, nargs='+',
                         help='Sizes of beam to use for beam search (or number of samples for sampling), '
                              '0 to disable (default), -1 for infinite')

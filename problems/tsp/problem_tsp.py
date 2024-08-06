@@ -2,6 +2,8 @@ from torch.utils.data import Dataset
 import torch
 import os
 import pickle
+import glob
+import numpy as np
 from problems.tsp.state_tsp import StateTSP
 from utils.beam_search import beam_search
 
@@ -79,7 +81,10 @@ class TSPDataset(Dataset):
             if filename.endswith('.npy'):
                 assert os.path.splitext(filename)[1] == '.npy'
                 
-                self.data = [torch.Tensor(row) for row in np.load(filename)]
+                data = np.load(filename)
+                if len(data.shape) == 2:
+                    data = data[None, :, :]
+                self.data = [torch.FloatTensor(row) for row in data[offset:offset+num_samples]]
             elif filename.endswith('.pkl'):
                 assert os.path.splitext(filename)[1] == '.pkl'
 
