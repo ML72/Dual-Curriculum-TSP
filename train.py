@@ -14,6 +14,7 @@ from utils.transformations import transform_tensor_batch
 from utils.hardness_adaptive import get_hard_samples
 from utils.ewc import EWC
 from utils.log_utils import log_values
+from utils.distributions import link_batch
 from utils import move_to
 
 
@@ -205,9 +206,9 @@ def train_epoch(
         num_replace = train_regret.size(0) // 2
         low_idx = sorted_idx[:num_replace]
         high_idx = sorted_idx[num_replace:num_replace*2]
-        new_data = [
-            torch.FloatTensor(opts.graph_size, 2).uniform_(0, 1) for i in range(num_replace)
-        ]
+        new_data_1 = torch.FloatTensor(num_replace // 2, opts.graph_size, 2).uniform_(0, 1)
+        new_data_2 = torch.from_numpy(link_batch(num_replace // 2, opts.graph_size))
+        new_data = torch.cat((new_data_1, new_data_2), dim=0)
 
         for i in range(num_replace):
             # Replace low_idx entries with edited high_idx entries, which incur high cost
