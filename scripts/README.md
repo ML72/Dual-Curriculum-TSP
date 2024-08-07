@@ -1,3 +1,3 @@
 # Training Scripts
 
-These job scripts are used for training and evaluation.
+This folder contains all exact scripts used for data generation, training, evaluation, and plot generation.

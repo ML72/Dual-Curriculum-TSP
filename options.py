@@ -49,6 +49,7 @@ def get_options(args=None):
                              'used for warmup phase), 0 otherwise. Can only be used with rollout baseline.')
     parser.add_argument('--ewc_lambda', type=float, default=0, help='Elastic weight consolidation lambda (0 to disable)')
     parser.add_argument('--ewc_fisher_n', type=int, default=2048, help='Number of samples to estimate Fisher Information')
+    parser.add_argument('--ewc_warmup_epochs', type=int, default=0, help='Number of warmup epochs using uniform samples')
     parser.add_argument('--ewc_from_unif', action='store_true', help='Use uniform samples to estimate Fisher Information')
     parser.add_argument('--ewc_adaptive', action='store_true', help='Use hardness adaptive EWC')
     parser.add_argument('--eval_batch_size', type=int, default=1024,

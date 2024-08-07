@@ -1,4 +1,5 @@
-data/
+data/tsp/
+data/tsplib/
 outputs/
 logs/
 results/

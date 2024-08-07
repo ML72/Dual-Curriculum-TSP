@@ -6,6 +6,20 @@ from utils.distributions import gaussian_mixture_batch, poly_batch, diag_batch, 
 
 
 def generate_tsp_data(dataset_size, tsp_size, distribution='unif'):
+    # TSPLib distribution
+    if distribution == 'tsplib':
+        tsplib = []
+        for filename in os.listdir('data/tsplib'):
+            if filename.endswith(".npy") and not filename.endswith("sol.npy"):
+                instance = np.load(os.path.join('data/tsplib', filename))
+                if instance.shape[0] > tsp_size:
+                    tsplib.append(instance)
+        result = np.zeros((dataset_size, tsp_size, 2))
+        for i in range(dataset_size):
+            instance = tsplib[i % len(tsplib)]
+            result[i] = instance[np.random.choice(instance.shape[0], tsp_size, replace=False)]
+        return result.tolist()
+
     # Gaussian mixture distribution
     if distribution == 'gmm':
         cdist_list = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
@@ -149,7 +163,7 @@ if __name__ == "__main__":
         "Can only specify filename when generating a single dataset"
 
     distributions_per_problem = {
-        'tsp': ['unif', 'gmm', 'poly', 'diag', 'link'],
+        'tsp': ['unif', 'tsplib', 'gmm', 'poly', 'diag', 'link'],
         'vrp': [None],
         'pctsp': [None],
         'op': ['const', 'unif', 'dist']

@@ -106,7 +106,7 @@ def train_epoch(
     # Initialize EWC if applicable
     ewc = None
     if opts.ewc_lambda > 0:
-        if ewc_dataset is None or opts.ewc_from_unif:
+        if ewc_dataset is None or opts.ewc_from_unif or epoch < opts.ewc_warmup_epochs:
             ewc_dataset = torch.FloatTensor(opts.ewc_fisher_n, opts.graph_size, 2).uniform_(0, 1).to(opts.device)
         if opts.ewc_adaptive:
             ewc_dataset = get_hard_samples(
