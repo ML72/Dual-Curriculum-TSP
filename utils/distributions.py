@@ -92,13 +92,14 @@ def diag_batch(batch_size, tsp_size, dist):
     
     return points
 
-def link_batch(batch_size, tsp_size, noise=0.05):
+def link_batch(batch_size, tsp_size, link_size=2, noise=0.05):
     # Generate points along random diagonal
-    centers = np.random.uniform(0, 1, size=(batch_size, tsp_size // 2, 2))
+    links = tsp_size // link_size
+    centers = np.random.uniform(0, 1, size=(batch_size, links, 2))
     points = np.zeros((batch_size, tsp_size, 2))
-    points[:, :tsp_size//2] = centers + np.random.uniform(-noise, noise, size=(batch_size, tsp_size // 2, 2))
-    points[:, tsp_size//2:] = centers + np.random.uniform(-noise, noise, size=(batch_size, tsp_size // 2, 2))
-
+    for i in range(link_size):
+        points[:, i:i+(links*link_size):link_size] = centers + np.random.uniform(-noise, noise, size=(batch_size, links, 2))
+    points[:, tsp_size - (tsp_size % link_size):] = np.random.uniform(0, 1, size=(batch_size, tsp_size % link_size, 2))
     
     # Translate and scale points to fit inside unit square
     points -= np.min(points, axis=1, keepdims=True)

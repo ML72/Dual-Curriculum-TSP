@@ -206,9 +206,13 @@ def train_epoch(
         num_replace = train_regret.size(0) // 2
         low_idx = sorted_idx[:num_replace]
         high_idx = sorted_idx[num_replace:num_replace*2]
-        new_data_1 = torch.FloatTensor(num_replace // 2, opts.graph_size, 2).uniform_(0, 1)
-        new_data_2 = torch.from_numpy(link_batch(num_replace // 2, opts.graph_size))
-        new_data = torch.cat((new_data_1, new_data_2), dim=0)
+        new_data = []
+        link_size_list = [1, 3, 5, 10]
+        for link_size in link_size_list:
+            new_data.append(torch.from_numpy(
+                link_batch(num_replace // len(link_size_list), opts.graph_size, link_size=link_size)
+            ).float())
+        new_data = torch.cat(new_data, dim=0)
 
         for i in range(num_replace):
             # Replace low_idx entries with edited high_idx entries, which incur high cost
