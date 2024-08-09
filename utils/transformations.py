@@ -110,7 +110,7 @@ def translate_tensor_batch(tensors, x_diff, y_diff):
     M, N, _ = tensors.shape
 
     # Calculate and apply the desired translation matrix
-    translated_coordinates = torch.zeros((M, 2, 2), dtype=tensors.dtype, device=tensors.device)
+    translated_coordinates = torch.zeros((M, N, 2), dtype=tensors.dtype, device=tensors.device)
     translated_coordinates[:, :, 0] = tensors[:, :, 0] + x_diff[:, None]
     translated_coordinates[:, :, 1] = tensors[:, :, 1] + y_diff[:, None]
 
