@@ -15,6 +15,7 @@ from reinforce_baselines import NoBaseline, ExponentialBaseline, CriticBaseline,
 from nets.attention_model import AttentionModel
 from nets.pointer_network import PointerNetwork, CriticNetworkLSTM
 from utils import torch_load_cpu, load_problem, load_model
+from utils.genome import sample_random_genomes
 
 
 def run(opts):
@@ -159,16 +160,16 @@ def run(opts):
     if opts.eval_only:
         validate(model, val_dataset, opts)
     else:
-        training_dataset = None
+        genomes = sample_random_genomes(opts.epoch_size) if opts.use_genome else None
         ewc_dataset = None
         for epoch in range(opts.epoch_start, opts.epoch_start + opts.n_epochs):
-            training_dataset, ewc_dataset = train_epoch(
+            genomes, ewc_dataset = train_epoch(
                 model,
                 optimizer,
                 baseline,
                 lr_scheduler,
                 epoch,
-                training_dataset,
+                genomes,
                 ewc_dataset,
                 val_dataset,
                 problem,

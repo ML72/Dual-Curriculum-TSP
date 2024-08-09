@@ -9,8 +9,8 @@ from torch.utils.data import DataLoader
 from torch.nn import DataParallel
 
 from nets.attention_model import set_decode_type
-from utils.level_edit import global_perturb_tensor, local_perturb_tensor, random_edit_tensor
-from utils.transformations import transform_tensor_batch
+from utils.transformations import transform_tensor_batch, fit_unit_batch, rotate_tensor_batch, translate_tensor_batch, scale_tensor_batch
+from utils.genome import sample_random_genomes, GENOME_SIZE, GENOME_MAX, GENOME_MIN, GENOME_INC
 from utils.hardness_adaptive import get_hard_samples
 from utils.ewc import EWC
 from utils.log_utils import log_values
@@ -76,7 +76,7 @@ def train_epoch(
         baseline,
         lr_scheduler,
         epoch,
-        training_dataset,
+        genomes,
         ewc_dataset,
         val_dataset,
         problem,
@@ -90,11 +90,32 @@ def train_epoch(
     if not opts.no_tensorboard:
         tb_logger.log_value('learnrate_pg0', optimizer.param_groups[0]['lr'], step)
 
-    # Generate new training data for each epoch
-    if training_dataset == None:
-        training_dataset = problem.make_dataset(
-            size=opts.graph_size, num_samples=opts.epoch_size, distribution=opts.data_distribution
+    # Generate training data based on genome
+    assert len(genomes) == opts.epoch_size, "Genome length does not match epoch size"
+    training_dataset = problem.make_dataset(
+        size=opts.graph_size, num_samples=opts.epoch_size, distribution=opts.data_distribution
+    )
+    if opts.use_genome:
+        # Draw data
+        data_tensor = torch.zeros((opts.epoch_size, opts.graph_size, 2), dtype=torch.float)
+        for i in range(opts.epoch_size):
+            data_tensor[i] = torch.from_numpy(
+                link_batch(1, opts.graph_size, link_size=int(genomes[i,0]), noise=float(genomes[i,1]))[0],
+            ).float()
+        
+        # Apply transformations
+        # We did the math, points are guaranteed to be within [0,1]^2 afterwards
+        scale_vec = genomes[:,3]
+        data_tensor = rotate_tensor_batch(data_tensor, genomes[:,2])
+        data_tensor = fit_unit_batch(data_tensor)
+        data_tensor = scale_tensor_batch(data_tensor, scale_vec)
+        data_tensor = translate_tensor_batch(
+            data_tensor, genomes[:,4] * (1 - scale_vec), genomes[:,5] * (1 - scale_vec)
         )
+
+        # Port into training_dataset
+        for i in range(opts.epoch_size):
+            training_dataset[i] = data_tensor[i]
     
     # Randomly make half the data harder if hardness adaptive curriculum is used
     if opts.hardness_adaptive_percent > 0:
@@ -173,10 +194,9 @@ def train_epoch(
     lr_scheduler.step()
 
     # Compute regret on instances
-    edit_function = opts.edit_fn
     calc_ewc = opts.ewc_lambda > 0
-    calc_dataset = (edit_function != None and opts.problem == 'tsp')
-    if calc_ewc or calc_dataset:
+    calc_genome = opts.use_genome
+    if calc_ewc or calc_genome:
         bl_cost = 0
         if baseline is not None and hasattr(baseline, 'model'):
             bl_cost = rollout(baseline.model, training_dataset, opts)
@@ -191,36 +211,23 @@ def train_epoch(
             ewc_dataset_new.append(training_dataset[sorted_idx[i]])
         ewc_dataset = torch.stack(ewc_dataset_new, dim=0).to(opts.device)
 
-    # Calculate new training data if applicable
-    # Only available for TSP problem
-    if not calc_dataset:
-        training_dataset = None
-    else:
-        if opts.edit_fn == 'global_perturb':
-            edit_function = global_perturb_tensor
-        elif opts.edit_fn == 'local_perturb':
-            edit_function = local_perturb_tensor
-        elif opts.edit_fn == 'random_edit':
-            edit_function = random_edit_tensor
+    # Calculate new genome if applicable
+    new_genomes = None
+    if calc_genome:
+        num_draw = train_regret.size(0) // 2
+        num_mutate = train_regret.size(0) - num_draw
+        high_idx = sorted_idx[num_draw:]
+        new_genomes = torch.zeros(opts.epoch_size, GENOME_SIZE)
 
-        num_replace = train_regret.size(0) // 2
-        low_idx = sorted_idx[:num_replace]
-        high_idx = sorted_idx[num_replace:num_replace*2]
-        new_data = []
-        link_size_list = [1, 3, 5, 10]
-        for link_size in link_size_list:
-            new_data.append(torch.from_numpy(
-                link_batch(num_replace // len(link_size_list), opts.graph_size, link_size=link_size)
-            ).float())
-        new_data = torch.cat(new_data, dim=0)
+        # Fill in new genome
+        delta = torch.randint(-1, 2, (num_mutate,))[:, None] * GENOME_INC[None, :]
+        new_genomes[num_draw:] = genomes[high_idx] + delta
+        new_genomes[:num_draw] = sample_random_genomes(num_draw)
 
-        for i in range(num_replace):
-            # Replace low_idx entries with edited high_idx entries, which incur high cost
-            training_dataset[low_idx[i]] = edit_function(training_dataset[high_idx[i]], 20)
-            # Replace high_idx entries with fresh data
-            training_dataset[high_idx[i]] = new_data[i]
+        # Clip values
+        new_genomes = torch.clamp(new_genomes, min=GENOME_MIN, max=GENOME_MAX)
     
-    return training_dataset, ewc_dataset
+    return new_genomes, ewc_dataset
 
 
 def train_batch(

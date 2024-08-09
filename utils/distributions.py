@@ -94,7 +94,7 @@ def diag_batch(batch_size, tsp_size, dist):
 
 def link_batch(batch_size, tsp_size, link_size=2, noise=0.05):
     # Generate points along random diagonal
-    links = tsp_size // link_size
+    links = tsp_size // min(link_size, tsp_size)
     centers = np.random.uniform(0, 1, size=(batch_size, links, 2))
     points = np.zeros((batch_size, tsp_size, 2))
     for i in range(link_size):

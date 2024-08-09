@@ -61,9 +61,8 @@ def get_options(args=None):
                              ' to save memory (default None means no shrinking)')
     parser.add_argument('--data_distribution', type=str, default=None,
                         help='Data distribution to use during training, defaults and options depend on problem.')
-    parser.add_argument('--edit_fn', type=str, default=None,
-                        help="Dual curriculum edit function to use: 'global_perturb', 'local_perturb' or 'random_edit'. "
-                             'Defaults to no edit function. Only available for tsp problem.')
+    parser.add_argument('--use_genome', action='store_true',
+                        help="Use an evolutionary grammar-based genome to generate training data")
     parser.add_argument('--hardness_adaptive_percent', type=int, default=0,
                         help='Percent of epoch to put under hardness adaptive curriculum')
     parser.add_argument('--data_equivariance', action='store_true',
